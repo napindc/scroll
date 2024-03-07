@@ -16,23 +16,27 @@ import signal
 import sys
 from types import FrameType
 
-from flask import Flask
+from fastapi import FastAPI
 
 from utils.logging import logger
 
-app = Flask(__name__)
+app = FastAPI()
 
 
-@app.route("/")
+@app.get("/")
 def hello() -> str:
-    # Use basic logging with custom fields
-    logger.info(logField="custom-entry", arbitraryField="custom-entry")
 
     # https://cloud.google.com/run/docs/logging#correlate-logs
     logger.info("Child logger with trace Id.")
 
     return "Hello, World!"
 
+
+@app.get("/scroll/protocols/{protocol_name}/swap/")
+def swap_mock(protocol_name: str) -> str:
+    
+    logger.info(f"Swapping on protocol {protocol_name} using the Scroll Network!")
+    return f"Swapping on protocol {protocol_name} using the Scroll Network!"
 
 def shutdown_handler(signal_int: int, frame: FrameType) -> None:
     logger.info(f"Caught Signal {signal.strsignal(signal_int)}")

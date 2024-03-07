@@ -72,11 +72,16 @@ def start(c):  # noqa: ANN001, ANN201
 
 
 @task(pre=[require_venv])
-def dev(c):  # noqa: ANN001, ANN201
+def dev_flask(c):  # noqa: ANN001, ANN201
     """Start the web service in a development environment, with fast reload"""
     with c.prefix(venv):
         c.run("FLASK_ENV=development python app.py")
 
+@task(pre=[require_venv])
+def dev_fast(c):  # noqa: ANN001, ANN201
+    """Start the web service in a development environment, with fast reload"""
+    with c.prefix(venv):
+        c.run("uvicorn app:app --reload")
 
 @task(pre=[require_venv])
 def lint(c):  # noqa: ANN001, ANN201
