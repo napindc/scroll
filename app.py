@@ -36,6 +36,7 @@ def hello() -> str:
 def swap_mock(protocol_name: str) -> str:
     
     logger.info(f"Swapping on protocol {protocol_name} using the Scroll Network!")
+    
     return f"Swapping on protocol {protocol_name} using the Scroll Network!"
 
 def shutdown_handler(signal_int: int, frame: FrameType) -> None:

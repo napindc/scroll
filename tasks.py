@@ -84,6 +84,12 @@ def dev_fast(c):  # noqa: ANN001, ANN201
         c.run("uvicorn app:app --reload")
 
 @task(pre=[require_venv])
+def use_cli(c): # noqa: ANN001, ANN201
+    """Run the CLI"""
+    with c.prefix(venv):
+        c.run("python ./domain/main.py")
+
+@task(pre=[require_venv])
 def lint(c):  # noqa: ANN001, ANN201
     """Run linting checks"""
     with c.prefix(venv):
