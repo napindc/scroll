@@ -329,3 +329,17 @@ __pycache__/
 */__pycache__/
 .idea/
 accounts.txt
+
+# Exclude locally installed dependencies
+venv/
+__pycache__/
+
+# Exclude local IDE settings
+.idea/
+.vscode/
+
+# Exclude testing cache
+.pytest_cache/
+
+# macOS
+**/.DS_Store
