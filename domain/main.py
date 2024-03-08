@@ -4,99 +4,26 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import Union
 
-import questionary
+import argparse
+import types
 from loguru import logger
-from questionary import Choice
 
-from config import ACCOUNTS, RECIPIENTS
-from settings import (
-    RANDOM_WALLET,
-    SLEEP_TO,
-    SLEEP_FROM,
-    QUANTITY_THREADS,
-    THREAD_SLEEP_FROM,
-    THREAD_SLEEP_TO, REMOVE_WALLET
-)
+import modules_settings
 from modules_settings import *
 from utils.helpers import remove_wallet
 from utils.sleeping import sleep
 
-
-def get_module():
-    result = questionary.select(
-        "Select a method to get started",
-        choices=[
-            Choice("1) Deposit to Scroll", deposit_scroll),
-            Choice("2) Withdraw from Scroll", withdraw_scroll),
-            Choice("3) Bridge Orbiter", bridge_orbiter),
-            Choice("4) Bridge Layerswap", bridge_layerswap),
-            Choice("5) Bridge Nitro", bridge_nitro),
-            Choice("6) Wrap ETH", wrap_eth),
-            Choice("7) Unwrap ETH", unwrap_eth),
-            Choice("8) Swap on Skydrome", swap_skydrome),
-            Choice("9) Swap on Zebra", swap_zebra),
-            Choice("10) Swap on SyncSwap", swap_syncswap),
-            Choice("11) Swap on XYSwap", swap_xyswap),
-            Choice("12) Deposit LayerBank", deposit_layerbank),
-            Choice("13) Deposit Aave", deposit_aave),
-            Choice("14) Withdraw LayerBank", withdraw_layerbank),
-            Choice("15) Withdraw Aave", withdraw_aave),
-            Choice("16) Mint and Bridge Zerius NFT", mint_zerius),
-            Choice("17) Mint L2Pass NFT", mint_l2pass),
-            Choice("18) Mint ZkStars NFT", mint_zkstars),
-            Choice("19) Create NFT collection on Omnisea", create_omnisea),
-            Choice("20) RubyScore Vote", rubyscore_vote),
-            Choice("21) Mint NFT on NFTS2ME", mint_nft),
-            Choice("22) Dmail send email", send_mail),
-            Choice("23) Create gnosis safe", create_safe),
-            Choice("24) Deploy contract", deploy_contract),
-            Choice("25) Swap tokens to ETH", swap_tokens),
-            Choice("26) Use Multiswap", swap_multiswap),
-            Choice("27) Use custom routes", custom_routes),
-            Choice("28) Make transfer", make_transfer),
-            Choice("29) Check transaction count", "tx_checker"),
-            Choice("30) Exit", "exit"),
-        ],
-        qmark="⚙️ ",
-        pointer="✅ "
-    ).ask()
-    if result == "exit":
-        print("\n❤️ Subscribe to me – https://t.me/sybilwave\n")
-        print("🤑 Donate me: 0x00000b0ddce0bfda4531542ad1f2f5fad7b9cde9")
-        sys.exit()
-    return result
-
-
-def get_wallets(use_recipients: bool = False):
-    if use_recipients:
-        account_with_recipients = dict(zip(ACCOUNTS, RECIPIENTS))
-
-        wallets = [
-            {
-                "id": _id,
-                "key": key,
-                "recipient": account_with_recipients[key],
-            } for _id, key in enumerate(account_with_recipients, start=1)
-        ]
-    else:
-        wallets = [
-            {
-                "id": _id,
-                "key": key,
-            } for _id, key in enumerate(ACCOUNTS, start=1)
-        ]
-
-    return wallets
-
+SLEEP_FROM = -1 # Seconds
+SLEEP_TO = -1 # Seconds
 
 async def run_module(module, account_id, key, recipient: Union[str, None] = None):
+    assert SLEEP_FROM > 0, "The minimum time in seconds to sleep between transactions must be greater than 0"
+    assert SLEEP_TO > 0, "The maximum time in seconds to sleep between transactions must be greater than 0"
+
     try:
         await module(account_id, key, recipient)
     except Exception as e:
         logger.error(e)
-
-    if REMOVE_WALLET:
-        remove_wallet(key)
 
     await sleep(SLEEP_FROM, SLEEP_TO)
 
@@ -105,37 +32,74 @@ def _async_run_module(module, account_id, key, recipient):
     asyncio.run(run_module(module, account_id, key, recipient))
 
 
-def main(module):
-    if module in [make_transfer]:
-        wallets = get_wallets(True)
-    else:
-        wallets = get_wallets()
+def main(module, wallets, quantity_threads=-1, 
+         thread_sleep_from=-1, thread_sleep_to=-1):
 
-    if RANDOM_WALLET:
-        random.shuffle(wallets)
+    assert quantity_threads > 0, "The number of threads must be greater than 0"
+    assert thread_sleep_from > 0, "The minimum time in seconds to sleep between transactions must be greater than 0"
+    assert thread_sleep_to > 0, "The maximum time in seconds to sleep between transactions must be greater than 0"
 
-    with ThreadPoolExecutor(max_workers=QUANTITY_THREADS) as executor:
-        for _, account in enumerate(wallets, start=1):
+    with ThreadPoolExecutor(max_workers=quantity_threads) as executor:
+        for _, wallet_key in enumerate(wallets, start=1):
             executor.submit(
                 _async_run_module,
                 module,
-                account.get("id"),
-                account.get("key"),
-                account.get("recipient", None)
+                _,
+                wallet_key,
+                None
             )
-            time.sleep(random.randint(THREAD_SLEEP_FROM, THREAD_SLEEP_TO))
+            time.sleep(random.randint(thread_sleep_from, thread_sleep_to))
 
 
 if __name__ == '__main__':
-    print("❤️ Subscribe to me – https://t.me/sybilwave\n")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("action", help="The transaction type you want to perform")
+    parser.add_argument("-R", "--random", help="Use wallets in a random order", action="store_true")
+    wallet_group = parser.add_argument_group("Wallets")
+    wallet_xclsv_group = wallet_group.add_mutually_exclusive_group(required=True)
+    wallet_xclsv_group.add_argument("--wallet", help="The wallet you want to use")
+    wallet_xclsv_group.add_argument("--wallets", type=list, help="The wallets you want to use")
+    thread_settings_group = parser.add_argument_group("Thread Settings")
+    thread_settings_group.add_argument("--threads", type=int, default=1, help="The number of threads to use")
+    thread_settings_group.add_argument("--thread-sleep-from", type=int, default=5, help="The minimum time in seconds to sleep between transactions")
+    thread_settings_group.add_argument("--thread-sleep-to", type=int, default=5, help="The maximum time in seconds to sleep between transactions")
+    execution_cadence_group = parser.add_argument_group("Execution Cadence Settings")
+    execution_cadence_group.add_argument("--sleep-from", type=int, default=500, help="The minimum time in seconds to sleep between transactions")
+    execution_cadence_group.add_argument("--sleep-to", type=int, default=1000, help="The maximum time in seconds to sleep between transactions")
+    
+    args = parser.parse_args()
+
+    assert args.action, "You must provide an action to perform"
+    assert args.action in modules_settings.__dict__, f"Action {args.action} is not supported"
+
+    module = modules_settings.__dict__[args.action]
+    assert type(module) == types.FunctionType, f"Action {args.action} is not supported"
+
+    SLEEP_FROM = args.sleep_from
+    SLEEP_TO = args.sleep_to
+
+    # assert that either the wallet or list of wallets is provided
+    assert args.wallet or args.wallets, "You must provide a wallet to use"
+
+    wallets = []
+    if args.wallets:
+        wallets = args.wallets
+    elif args.wallet:
+        wallets = [args.wallet]
+
+    if args.random:
+        random.shuffle(wallets)
 
     logger.add("logging.log")
 
-    module = get_module()
     if module == "tx_checker":
-        get_tx_count()
+        modules_settings.get_tx_count()
     else:
-        main(module)
+        main(
+             module, 
+             wallets, 
+             quantity_threads=args.threads, 
+             thread_sleep_from=args.thread_sleep_from, 
+             thread_sleep_to=args.thread_sleep_to
+             )
 
-    print("\n❤️ Subscribe to me – https://t.me/sybilwave\n")
-    print("🤑 Donate me: 0x00000b0ddce0bfda4531542ad1f2f5fad7b9cde9")
