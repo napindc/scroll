@@ -6,12 +6,6 @@ with open('domain/data/rpc.json') as file:
 with open('domain/data/abi/erc20_abi.json') as file:
     ERC20_ABI = json.load(file)
 
-with open("domain/accounts.txt", "r") as file:
-    ACCOUNTS = [row.strip() for row in file]
-
-with open("domain/recipients.txt", "r") as file:
-    RECIPIENTS = [row.strip() for row in file]
-
 with open('domain/data/abi/bridge/deposit.json') as file:
     DEPOSIT_ABI = json.load(file)
 

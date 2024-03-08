@@ -596,5 +596,5 @@ async def rubyscore_vote(account_id, key, recipient):
     await rubyscore.vote()
 
 
-def get_tx_count():
-    asyncio.run(check_tx())
+def get_tx_count(wallets):
+    asyncio.run(check_tx(wallets))

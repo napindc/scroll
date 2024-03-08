@@ -93,7 +93,7 @@ if __name__ == '__main__':
     logger.add("logging.log")
 
     if module == "tx_checker":
-        modules_settings.get_tx_count()
+        modules_settings.get_tx_count(wallets)
     else:
         main(
              module, 
