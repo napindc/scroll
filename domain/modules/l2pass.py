@@ -1,7 +1,7 @@
 from loguru import logger
-from config import L2PASS_ABI
-from utils.gas_checker import check_gas
-from utils.helpers import retry
+from domain.config import L2PASS_ABI
+from domain.utils.gas_checker import check_gas
+from domain.utils.helpers import retry
 from .account import Account
 
 

@@ -2,9 +2,9 @@ from typing import Dict
 
 import aiohttp
 from loguru import logger
-from config import XYSWAP_CONTRACT, SCROLL_TOKENS
-from utils.gas_checker import check_gas
-from utils.helpers import retry
+from domain.config import XYSWAP_CONTRACT, SCROLL_TOKENS
+from domain.utils.gas_checker import check_gas
+from domain.utils.helpers import retry
 from .account import Account
 
 

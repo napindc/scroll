@@ -2,9 +2,9 @@ import random
 from typing import List
 
 from loguru import logger
-from config import NFTS2ME_ABI
-from utils.gas_checker import check_gas
-from utils.helpers import retry
+from domain.config import NFTS2ME_ABI
+from domain.utils.gas_checker import check_gas
+from domain.utils.helpers import retry
 from .account import Account
 
 

@@ -1,6 +1,6 @@
 from loguru import logger
-from settings import RETRY_COUNT
-from utils.sleeping import sleep
+from domain.settings import RETRY_COUNT
+from domain.utils.sleeping import sleep
 
 
 def retry(func):

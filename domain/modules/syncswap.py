@@ -2,7 +2,7 @@ import time
 
 from loguru import logger
 from web3 import Web3
-from config import (
+from domain.config import (
     SCROLL_TOKENS,
     SYNCSWAP_CLASSIC_POOL_ABI,
     ZERO_ADDRESS,
@@ -10,8 +10,8 @@ from config import (
     SYNCSWAP_ROUTER_ABI,
     SYNCSWAP_CLASSIC_POOL_DATA_ABI
 )
-from utils.gas_checker import check_gas
-from utils.helpers import retry
+from domain.utils.gas_checker import check_gas
+from domain.utils.helpers import retry
 from .account import Account
 from eth_abi import abi
 

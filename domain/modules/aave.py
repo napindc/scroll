@@ -1,10 +1,10 @@
 from typing import Dict
 
 from loguru import logger
-from config import AAVE_CONTRACT, AAVE_WETH_CONTRACT, AAVE_ABI
-from utils.gas_checker import check_gas
-from utils.helpers import retry
-from utils.sleeping import sleep
+from domain.config import AAVE_CONTRACT, AAVE_WETH_CONTRACT, AAVE_ABI
+from domain.utils.gas_checker import check_gas
+from domain.utils.helpers import retry
+from domain.utils.sleeping import sleep
 from .account import Account
 
 

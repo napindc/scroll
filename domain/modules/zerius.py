@@ -3,10 +3,10 @@ from typing import List
 
 from loguru import logger
 
-from config import ZERIUS_CONTRACT, ZERIUS_ABI, ZERO_ADDRESS
-from utils.gas_checker import check_gas
-from utils.helpers import retry
-from utils.sleeping import sleep
+from domain.config import ZERIUS_CONTRACT, ZERIUS_ABI, ZERO_ADDRESS
+from domain.utils.gas_checker import check_gas
+from domain.utils.helpers import retry
+from domain.utils.sleeping import sleep
 from .account import Account
 
 

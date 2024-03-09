@@ -3,9 +3,9 @@ from typing import Union, Dict
 import aiohttp
 from loguru import logger
 
-from settings import LAYERSWAP_API_KEY
-from utils.gas_checker import check_gas
-from utils.helpers import retry
+from domain.settings import LAYERSWAP_API_KEY
+from domain.utils.gas_checker import check_gas
+from domain.utils.helpers import retry
 from .account import Account
 
 

@@ -1,10 +1,10 @@
 import random
 
 from loguru import logger
-from config import ZKSTARS_ABI
-from utils.gas_checker import check_gas
-from utils.helpers import retry
-from utils.sleeping import sleep
+from domain.config import ZKSTARS_ABI
+from domain.utils.gas_checker import check_gas
+from domain.utils.helpers import retry
+from domain.utils.sleeping import sleep
 from .account import Account
 
 

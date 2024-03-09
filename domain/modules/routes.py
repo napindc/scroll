@@ -1,7 +1,7 @@
 import random
 
 from loguru import logger
-from utils.sleeping import sleep
+from domain.utils.sleeping import sleep
 from .account import Account
 
 

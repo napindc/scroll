@@ -1,10 +1,10 @@
 import aiohttp
 from loguru import logger
 
-from utils.gas_checker import check_gas
-from utils.helpers import retry
+from domain.utils.gas_checker import check_gas
+from domain.utils.helpers import retry
 from .account import Account
-from config import ORBITER_CONTRACT
+from domain.config import ORBITER_CONTRACT
 
 
 class Orbiter(Account):

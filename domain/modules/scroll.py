@@ -1,10 +1,10 @@
 from loguru import logger
 
-from utils.gas_checker import check_gas
-from utils.helpers import retry
+from domain.utils.gas_checker import check_gas
+from domain.utils.helpers import retry
 from .account import Account
 
-from config import (
+from domain.config import (
     BRIDGE_CONTRACTS,
     DEPOSIT_ABI,
     WITHDRAW_ABI,

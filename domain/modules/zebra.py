@@ -2,9 +2,9 @@ import time
 
 from loguru import logger
 from web3 import Web3
-from config import ZEBRA_ROUTER_ABI, ZEBRA_CONTRACTS, SCROLL_TOKENS
-from utils.gas_checker import check_gas
-from utils.helpers import retry
+from domain.config import ZEBRA_ROUTER_ABI, ZEBRA_CONTRACTS, SCROLL_TOKENS
+from domain.utils.gas_checker import check_gas
+from domain.utils.helpers import retry
 from .account import Account
 
 

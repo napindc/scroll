@@ -2,9 +2,9 @@ import random
 from hashlib import sha256
 
 from loguru import logger
-from config import DMAIL_CONTRACT, DMAIL_ABI
-from utils.gas_checker import check_gas
-from utils.helpers import retry
+from domain.config import DMAIL_CONTRACT, DMAIL_ABI
+from domain.utils.gas_checker import check_gas
+from domain.utils.helpers import retry
 from .account import Account
 
 

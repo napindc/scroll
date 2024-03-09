@@ -1,7 +1,7 @@
 from loguru import logger
-from utils.gas_checker import check_gas
-from utils.helpers import retry
-from config import DEPLOYER_ABI, DEPLOYER_BYTECODE
+from domain.utils.gas_checker import check_gas
+from domain.utils.helpers import retry
+from domain.config import DEPLOYER_ABI, DEPLOYER_BYTECODE
 from .account import Account
 
 

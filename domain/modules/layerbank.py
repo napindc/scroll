@@ -1,8 +1,8 @@
 from loguru import logger
-from config import LAYERBANK_CONTRACT, LAYERBANK_WETH_CONTRACT, LAYERBANK_ABI
-from utils.gas_checker import check_gas
-from utils.helpers import retry
-from utils.sleeping import sleep
+from domain.config import LAYERBANK_CONTRACT, LAYERBANK_WETH_CONTRACT, LAYERBANK_ABI
+from domain.utils.gas_checker import check_gas
+from domain.utils.helpers import retry
+from domain.utils.sleeping import sleep
 from .account import Account
 
 

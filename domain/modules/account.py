@@ -11,9 +11,9 @@ from web3.contract import Contract
 from web3.exceptions import TransactionNotFound
 from web3.middleware import async_geth_poa_middleware
 
-from config import RPC, ERC20_ABI, SCROLL_TOKENS
-from settings import GAS_MULTIPLIER, MAX_PRIORITY_FEE
-from utils.sleeping import sleep
+from domain.config import RPC, ERC20_ABI, SCROLL_TOKENS
+from domain.settings import GAS_MULTIPLIER, MAX_PRIORITY_FEE
+from domain.utils.sleeping import sleep
 
 
 class Account:
