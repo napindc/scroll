@@ -129,12 +129,6 @@ if __name__ == '__main__':
     else:
 
         assert args.websites, "You must provide a website transaction type to perform"
-        
-        logger.info(f"Websites: {args.websites}")
-        logger.info(f"Websites split: {args.websites.split(' ')}")
-        logger.info(f"modules_settings dir: {dir(modules_settings)}")
-        logger.info(f"all in: {all([website in dir(modules_settings) for website in args.websites.split(' ')])}")
-
         assert all([website in dir(modules_settings) for website in args.websites.split(" ")]), f"Action {args.websites} is not supported"
 
         websites = [domain.modules_settings.__dict__[action] for action in args.websites.split(" ")]
