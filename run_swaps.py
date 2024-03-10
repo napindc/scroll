@@ -9,19 +9,24 @@ import random
 from loguru import logger
 
 class SwapRunner():
-    def __init__(self, websites=[], wallets=[], quantity_threads=1,
+    def __init__(self, websites=[], wallets=[], website_settings=[],
                  wait_between_wallets_max=30, wait_between_wallets_min=20, 
                  wait_between_websites_max=20, wait_between_websites_min=5, 
                  wait_between_cycles_max=((12*60*60)+90), wait_between_cycles_min=((12*60*60)+5)):
         self.websites = websites
         self.wallets = wallets
-        self.quantity_threads = quantity_threads 
+        self.website_settings = website_settings
         self.wait_between_wallets_max = wait_between_wallets_max
         self.wait_between_wallets_min = wait_between_wallets_min
         self.wait_between_websites_max = wait_between_websites_max
         self.wait_between_websites_min = wait_between_websites_min
         self.wait_between_cycles_max = wait_between_cycles_max
         self.wait_between_cycles_min = wait_between_cycles_min
+        # skydrome settings
+
+        # syncswap settings
+
+        # xyswap settings
 
     def list_websites(self):
         # Get all attributes of the module
@@ -40,12 +45,20 @@ class SwapRunner():
         if "tx_checker" in self.websites:
             domain.modules_settings.get_tx_count(wallets)
         else:
+            logger.info(f"Wait between wallets: {self.wait_between_wallets_min} - {self.wait_between_wallets_max} seconds")
+            logger.info(f"Wait between websites: {self.wait_between_websites_min} - {self.wait_between_websites_max} seconds")
+            logger.info(f"Wait between cycles: {self.wait_between_cycles_min} - {self.wait_between_cycles_max} seconds")
+
             domain.main(
                 self.websites,
                 self.wallets,
-                quantity_threads=self.quantity_threads,
-                thread_sleep_from=self.thread_sleep_from,
-                thread_sleep_to=self.thread_sleep_to
+                self.website_settings,
+                wait_between_wallets_max=self.wait_between_wallets_max,
+                wait_between_wallets_min=self.wait_between_wallets_min,
+                wait_between_websites_max=self.wait_between_websites_max,
+                wait_between_websites_min=self.wait_between_websites_min,
+                wait_between_cycles_max=self.wait_between_cycles_max,
+                wait_between_cycles_min=self.wait_between_cycles_min
             )
 
 
@@ -60,9 +73,6 @@ if __name__ == '__main__':
     wallet_xclsv_group.add_argument("--wallet", help="The wallet you want to use")
     wallet_xclsv_group.add_argument("--wallets", type=list, help="The wallets you want to use")
     
-    thread_settings_group = parser.add_argument_group("Thread Settings")
-    thread_settings_group.add_argument("--threads", type=int, default=1, help="The number of threads to use")
-
     wait_between_wallets_group = parser.add_argument_group("Wait Between Wallets")
     wait_between_wallets_group.add_argument("--wait-between-wallets-max-seconds", type=int, default=(30*60), help="The maximum time in seconds to wait between wallets default: 1800 seconds (30 minutes)")
     wait_between_wallets_group.add_argument("--wait-between-wallets-min-seconds", type=int, default=(20*60), help="The minimum time in seconds to wait between wallets default: 1200 seconds (20 minutes)")
@@ -82,7 +92,7 @@ if __name__ == '__main__':
     swap_skydrome_group.add_argument("--skydrome-max-amount", type=float, default=0.0002, help="The amount of the token you want to swap")
     swap_skydrome_group.add_argument("--skydrome-decimal", type=int, default=6, help="The decimal of the token you want to swap")
     swap_skydrome_group.add_argument("--skydrome-slippage", type=int, default=1, help="The slippage of the token you want to swap")
-    swap_skydrome_group.add_argument("--skydrome-all-amount", type=bool, default=True, help="Swap all the amount of the token you want to swap")
+    swap_skydrome_group.add_argument("--skydrome-all-amount", type=bool, default=False, help="Swap all the amount of the token you want to swap")
     swap_skydrome_group.add_argument("--skydrome-min-percent", type=int, default=100, help="The minimum percent of the token you want to swap")
     swap_skydrome_group.add_argument("--skydrome-max-percent", type=int, default=100, help="The maximum percent of the token you want to swap")
 
@@ -93,7 +103,7 @@ if __name__ == '__main__':
     swap_zebra_group.add_argument("--zebra-max-amount", type=float, default=0.0002, help="The amount of the token you want to swap")
     swap_zebra_group.add_argument("--zebra-decimal", type=int, default=6, help="The decimal of the token you want to swap")
     swap_zebra_group.add_argument("--zebra-slippage", type=int, default=1, help="The slippage of the token you want to swap")
-    swap_zebra_group.add_argument("--zebra-all-amount", type=bool, default=True, help="Swap all the amount of the token you want to swap")
+    swap_zebra_group.add_argument("--zebra-all-amount", type=bool, default=False, help="Swap all the amount of the token you want to swap")
     swap_zebra_group.add_argument("--zebra-min-percent", type=int, default=100, help="The minimum percent of the token you want to swap")
     swap_zebra_group.add_argument("--zebra-max-percent", type=int, default=100, help="The maximum percent of the token you want to swap")
 
@@ -104,7 +114,7 @@ if __name__ == '__main__':
     swap_syncswap_group.add_argument("--syncswap-max-amount", type=float, default=0.0002, help="The amount of the token you want to swap")
     swap_syncswap_group.add_argument("--syncswap-decimal", type=int, default=6, help="The decimal of the token you want to swap")
     swap_syncswap_group.add_argument("--syncswap-slippage", type=int, default=1, help="The slippage of the token you want to swap")
-    swap_syncswap_group.add_argument("--syncswap-all-amount", type=bool, default=True, help="Swap all the amount of the token you want to swap")
+    swap_syncswap_group.add_argument("--syncswap-all-amount", type=bool, default=False, help="Swap all the amount of the token you want to swap")
     swap_syncswap_group.add_argument("--syncswap-min-percent", type=int, default=100, help="The minimum percent of the token you want to swap")
     swap_syncswap_group.add_argument("--syncswap-max-percent", type=int, default=100, help="The maximum percent of the token you want to swap")
 
@@ -115,7 +125,7 @@ if __name__ == '__main__':
     swap_xyswap_group.add_argument("--xyswap-max-amount", type=float, default=0.0002, help="The amount of the token you want to swap")
     swap_xyswap_group.add_argument("--xyswap-decimal", type=int, default=6, help="The decimal of the token you want to swap")
     swap_xyswap_group.add_argument("--xyswap-slippage", type=int, default=1, help="The slippage of the token you want to swap")
-    swap_xyswap_group.add_argument("--xyswap-all-amount", type=bool, default=True, help="Swap all the amount of the token you want to swap")
+    swap_xyswap_group.add_argument("--xyswap-all-amount", type=bool, default=False, help="Swap all the amount of the token you want to swap")
     swap_xyswap_group.add_argument("--xyswap-min-percent", type=int, default=100, help="The minimum percent of the token you want to swap")
     swap_xyswap_group.add_argument("--xyswap-max-percent", type=int, default=100, help="The maximum percent of the token you want to swap")
 
@@ -146,12 +156,56 @@ if __name__ == '__main__':
         if args.random:
             random.shuffle(wallets)
 
+        website_settings = [
+            {
+                "from_token": args.skydrome_from_token,
+                "to_token": args.skydrome_to_token,
+                "min_amount": args.skydrome_min_amount,
+                "max_amount": args.skydrome_max_amount,
+                "slippage": args.skydrome_slippage,
+                "all_amount": args.skydrome_all_amount,
+                "min_percent": args.skydrome_min_percent,
+                "max_percent": args.skydrome_max_percent,
+            },
+            {
+                "from_token": args.zebra_from_token,
+                "to_token": args.zebra_to_token,
+                "min_amount": args.zebra_min_amount,
+                "max_amount": args.zebra_max_amount,
+                "slippage": args.zebra_slippage,
+                "all_amount": args.zebra_all_amount,
+                "min_percent": args.zebra_min_percent,
+                "max_percent": args.zebra_max_percent,
+            },
+            {
+                "from_token": args.syncswap_from_token,
+                "to_token": args.syncswap_to_token,
+                "min_amount": args.syncswap_min_amount,
+                "max_amount": args.syncswap_max_amount,
+                "slippage": args.syncswap_slippage,
+                "all_amount": args.syncswap_all_amount,
+                "min_percent": args.syncswap_min_percent,
+                "max_percent": args.syncswap_max_percent,
+            },
+            {
+                "from_token": args.xyswap_from_token,
+                "to_token": args.xyswap_to_token,
+                "min_amount": args.xyswap_min_amount,
+                "max_amount": args.xyswap_max_amount,
+                "slippage": args.xyswap_slippage,
+                "all_amount": args.xyswap_all_amount,
+                "min_percent": args.xyswap_min_percent,
+                "max_percent": args.xyswap_max_percent,
+            }
+        ]
+
+
         logger.add("logging.log")
         
         swap_runner = SwapRunner(
                                 websites=websites, 
                                 wallets=wallets, 
-                                quantity_threads=args.threads, 
+                                website_settings=website_settings,
                                 wait_between_wallets_max=args.wait_between_wallets_max_seconds, 
                                 wait_between_wallets_min=args.wait_between_wallets_min_seconds, 
                                 wait_between_websites_max=args.wait_between_websites_max_seconds, 

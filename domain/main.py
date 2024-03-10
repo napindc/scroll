@@ -1,33 +1,39 @@
 import random
-import sys
 import time
-from concurrent.futures import ThreadPoolExecutor
 from typing import Union
+import asyncio
 
-import argparse
-import types
 from loguru import logger
 
-import domain.modules_settings as modules_settings
-from domain.modules_settings import *
-from domain.utils.helpers import remove_wallet
-from domain.utils.sleeping import sleep
 
-async def run_module(module, wallet_number, key, recipient: Union[str, None] = None):
+async def run_module(module, wallet_number, key, recipient: Union[str, None] = None, settings: dict = {}):
     try:
-        await module(wallet_number, key, recipient)
+        await module(
+            wallet_number, 
+            key, 
+            recipient, 
+            from_token=settings.get('from_token'),
+            to_token=settings.get('to_token'),
+            min_amount=settings.get('min_amount'),
+            max_amount=settings.get('max_amount'),
+            slippage=settings.get('slippage'),
+            all_amount=settings.get('all_amount'),
+            min_percent=settings.get('min_percent'),
+            max_percent=settings.get('max_percent'),
+        )
+
     except Exception as e:
         logger.error(e)
 
 
-def _async_run_module(module, wallet_number, key, recipient):
-    asyncio.run(run_module(module, wallet_number, key, recipient))
+def _async_run_module(module, wallet_number, key, recipient, settings):
+    asyncio.run(run_module(module, wallet_number, key, recipient, settings))
 
 
 def main(
-        websites, 
-        wallets, 
-        quantity_threads=-1,
+        websites,
+        wallets,
+        website_settings, 
         wait_between_wallets_max=30,
         wait_between_wallets_min=20,
         wait_between_websites_max=20,
@@ -36,27 +42,34 @@ def main(
         wait_between_cycles_min=((12*60*60)+5),      
         ):
 
-    assert quantity_threads > 0, "The number of threads must be greater than 0"
+    
+    while True:
+        # iterate through the wallets
+        for _, wallet_key in enumerate(wallets, start=1):
+            # website transactions to perform at each website
+            # iterate through websites
+            for tuple in zip(websites, website_settings):
+                _async_run_module(
+                    tuple[0],
+                    _,
+                    wallet_key,
+                    None,
+                    tuple[1]
+                )
+            
+                # wait between website actions
+                random_wait = random.randint(wait_between_websites_min, wait_between_websites_max)
+                logger.info(f"Waiting between websites for {random_wait} seconds")
+                time.sleep(random_wait)
+            
+            # wait between wallets
+            random_wait = random.randint(wait_between_wallets_min, wait_between_wallets_max)
+            logger.info(f"Waiting between wallets for {random_wait} seconds")
+            time.sleep(random_wait)
 
-    with ThreadPoolExecutor(max_workers=quantity_threads) as executor:
-        while True:
-            # iterate through the wallets
-            for _, wallet_key in enumerate(wallets, start=1):
-                # website transactions to perform at each website
-                for module in websites:
-                    executor.submit(
-                        _async_run_module,
-                        module,
-                        _,
-                        wallet_key,
-                        None
-                    )
-                
-                    # wait between website actions
-                    time.sleep(random.randint(wait_between_websites_min, wait_between_websites_max))
-                
-                # wait between wallets
-                time.sleep(random.randint(wait_between_wallets_min, wait_between_wallets_max))
-
-            # wait between cycles
-            time.sleep(random.randint(wait_between_cycles_min, wait_between_cycles_max))
+        # wait between cycles
+        random_wait = random.randint(wait_between_cycles_min, wait_between_cycles_max)
+        logger.info(f"Waiting between cycles for {random_wait} seconds")
+        time.sleep(random_wait)
+        # change all the settings
+        # ETH to USDC or back
