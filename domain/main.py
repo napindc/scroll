@@ -8,10 +8,10 @@ import argparse
 import types
 from loguru import logger
 
-import modules_settings
-from modules_settings import *
-from utils.helpers import remove_wallet
-from utils.sleeping import sleep
+import domain.modules_settings as modules_settings
+from domain.modules_settings import *
+from domain.utils.helpers import remove_wallet
+from domain.utils.sleeping import sleep
 
 async def run_module(module, wallet_number, key, recipient: Union[str, None] = None):
     try:
