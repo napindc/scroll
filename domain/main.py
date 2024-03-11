@@ -49,6 +49,7 @@ def main(
             # website transactions to perform at each website
             # iterate through websites
             for tuple in zip(websites, website_settings):
+                logger.info(f"Running module {tuple[0].__name__} with wallet {wallet_key}")
                 _async_run_module(
                     tuple[0],
                     _,
@@ -71,5 +72,9 @@ def main(
         random_wait = random.randint(wait_between_cycles_min, wait_between_cycles_max)
         logger.info(f"Waiting between cycles for {random_wait} seconds")
         time.sleep(random_wait)
+        
         # change all the settings
-        # ETH to USDC or back
+        logger.info(f"Switching from_token and to_token")
+        for setting in website_settings:
+            # ETH to USDC or back
+            setting['from_token'], setting['to_token'] = setting['to_token'], setting['from_token']
