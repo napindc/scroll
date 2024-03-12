@@ -160,6 +160,8 @@ fabric.properties
 pyvenv.cfg
 .venv
 pip-selfcheck.json
+*.pyc
+*.log
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,pycharm,venv
 poetry.lock
