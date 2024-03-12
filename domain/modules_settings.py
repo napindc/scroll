@@ -1,5 +1,5 @@
 import asyncio
-from modules import *
+from domain.modules import *
 
 
 async def deposit_scroll(account_id, key, recipient):
@@ -161,7 +161,10 @@ async def unwrap_eth(account_id, key, recipient):
     await scroll.unwrap_eth(min_amount, max_amount, decimal, all_amount, min_percent, max_percent)
 
 
-async def swap_skydrome(account_id, key, recipient):
+async def swap_skydrome(account_id, key, recipient, 
+                        from_token="USDC", to_token="ETH",
+                        min_amount=0.0001, max_amount=0.0002, decimal=6, slippage=1,
+                        all_amount=True, min_percent=100, max_percent=100):
     """
     Make swap on Skydrome
     ______________________________________________________
@@ -173,18 +176,18 @@ async def swap_skydrome(account_id, key, recipient):
     all_amount - swap from min_percent to max_percent
     """
 
-    from_token = "USDC"
-    to_token = "ETH"
+    from_token = from_token
+    to_token = to_token
 
-    min_amount = 0.0001
-    max_amount = 0.0002
-    decimal = 6
-    slippage = 1
+    min_amount = min_amount
+    max_amount = max_amount
+    decimal = decimal
+    slippage = slippage
 
-    all_amount = True
+    all_amount = all_amount
 
-    min_percent = 100
-    max_percent = 100
+    min_percent = min_percent
+    max_percent = max_percent
 
     skydrome = Skydrome(account_id, key, recipient)
     await skydrome.swap(
@@ -192,7 +195,10 @@ async def swap_skydrome(account_id, key, recipient):
     )
 
 
-async def swap_zebra(account_id, key, recipient):
+async def swap_zebra(account_id, key, recipient,
+                     from_token="USDC", to_token="ETH",
+                     min_amount=0.0001, max_amount=0.0002, decimal=6, slippage=1,
+                     all_amount=True, min_percent=100, max_percent=100):
     """
     Make swap on Zebra
     ______________________________________________________
@@ -204,18 +210,18 @@ async def swap_zebra(account_id, key, recipient):
     all_amount - swap from min_percent to max_percent
     """
 
-    from_token = "USDC"
-    to_token = "ETH"
+    from_token = from_token
+    to_token = to_token
 
-    min_amount = 0.0001
-    max_amount = 0.0002
-    decimal = 6
-    slippage = 1
+    min_amount = min_amount
+    max_amount = max_amount
+    decimal = decimal
+    slippage = slippage
 
-    all_amount = True
+    all_amount = all_amount
 
-    min_percent = 100
-    max_percent = 100
+    min_percent = min_percent
+    max_percent = max_percent
 
     zebra = Zebra(account_id, key, recipient)
     await zebra.swap(
@@ -223,7 +229,10 @@ async def swap_zebra(account_id, key, recipient):
     )
 
 
-async def swap_syncswap(account_id, key, recipient):
+async def swap_syncswap(account_id, key, recipient,
+                        from_token="USDC", to_token="ETH",
+                        min_amount=0.0001, max_amount=0.0002, decimal=6, slippage=1,
+                        all_amount=True, min_percent=100, max_percent=100):
     """
     Make swap on SyncSwap
 
@@ -235,18 +244,18 @@ async def swap_syncswap(account_id, key, recipient):
     all_amount - swap from min_percent to max_percent
     """
 
-    from_token = "USDC"
-    to_token = "ETH"
+    from_token = from_token
+    to_token = to_token
 
-    min_amount = 1
-    max_amount = 2
-    decimal = 6
-    slippage = 1
+    min_amount = min_amount
+    max_amount = max_amount
+    decimal = decimal
+    slippage = slippage
 
-    all_amount = True
+    all_amount = all_amount
 
-    min_percent = 100
-    max_percent = 100
+    min_percent = min_percent
+    max_percent = max_percent
 
     syncswap = SyncSwap(account_id, key, recipient)
     await syncswap.swap(
@@ -254,7 +263,10 @@ async def swap_syncswap(account_id, key, recipient):
     )
 
 
-async def swap_xyswap(account_id, key, recipient):
+async def swap_xyswap(account_id, key, recipient,
+                      from_token="USDC", to_token="ETH",
+                      min_amount=0.0001, max_amount=0.0002, decimal=6, slippage=1,
+                      all_amount=True, min_percent=100, max_percent=100):
     """
     Make swap on XYSwap
     ______________________________________________________
@@ -266,18 +278,18 @@ async def swap_xyswap(account_id, key, recipient):
     all_amount - swap from min_percent to max_percent
     """
 
-    from_token = "USDC"
-    to_token = "ETH"
+    from_token = from_token
+    to_token = to_token
 
-    min_amount = 0.0001
-    max_amount = 0.0001
-    decimal = 6
-    slippage = 1
+    min_amount = min_amount
+    max_amount = max_amount
+    decimal = decimal
+    slippage = slippage
 
-    all_amount = True
+    all_amount = all_amount
 
-    min_percent = 100
-    max_percent = 100
+    min_percent = min_percent
+    max_percent = max_percent
 
     xyswap = XYSwap(account_id, key, recipient)
     await xyswap.swap(
@@ -596,5 +608,5 @@ async def rubyscore_vote(account_id, key, recipient):
     await rubyscore.vote()
 
 
-def get_tx_count():
-    asyncio.run(check_tx())
+def get_tx_count(wallets):
+    asyncio.run(check_tx(wallets))
