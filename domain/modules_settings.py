@@ -1,6 +1,10 @@
 import asyncio
 from domain.modules import *
-
+import datetime
+import json
+import os
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import unpad
 
 async def deposit_scroll(account_id, key, recipient):
     """
@@ -39,7 +43,11 @@ async def withdraw_scroll(account_id, key, recipient):
     max_percent = 10
 
     scroll = Scroll(account_id, key, "scroll", recipient)
-    await scroll.withdraw(min_amount, max_amount, decimal, all_amount, min_percent, max_percent)
+    try:
+      await scroll.withdraw(min_amount, max_amount, decimal, all_amount, min_percent, max_percent)
+    except Exception as e:
+      logger.error(f"Output while dealing with func:await scroll.withdraw{e} ")
+      await scroll.withdraw(min_amount, max_amount, decimal, all_amount, min_percent, max_percent)
 
 
 async def bridge_orbiter(account_id, key, recipient):
@@ -161,7 +169,7 @@ async def unwrap_eth(account_id, key, recipient):
     await scroll.unwrap_eth(min_amount, max_amount, decimal, all_amount, min_percent, max_percent)
 
 
-async def swap_skydrome(account_id, key, recipient, 
+async def swap_skydrome(account_id, key, recipient,
                         from_token="USDC", to_token="ETH",
                         min_amount=0.0001, max_amount=0.0002, decimal=6, slippage=1,
                         all_amount=True, min_percent=100, max_percent=100):
@@ -190,9 +198,15 @@ async def swap_skydrome(account_id, key, recipient,
     max_percent = max_percent
 
     skydrome = Skydrome(account_id, key, recipient)
-    await skydrome.swap(
-        from_token, to_token, min_amount, max_amount, decimal, slippage, all_amount, min_percent, max_percent
-    )
+    try:
+      await skydrome.swap(
+          from_token, to_token, min_amount, max_amount, decimal, slippage, all_amount, min_percent, max_percent
+      )
+    except Exception as e:
+      logger.error(f"Output while dealing with func:skydrome.swap : {e} ")
+      await skydrome.swap(
+          from_token, to_token, min_amount, max_amount, decimal, slippage, all_amount, min_percent, max_percent
+      )
 
 
 async def swap_zebra(account_id, key, recipient,
@@ -579,8 +593,13 @@ async def withdraw_layerbank(account_id, key, recipient):
 
 
 async def withdraw_aave(account_id, key, recipient):
-    aave = Aave(account_id, key, recipient)
-    await aave.withdraw()
+    try:
+      aave = Aave(account_id, key, recipient)
+      await aave.withdraw()
+    except Exception as e:
+        logger.error(f"Output while dealing with func:withdraw_aave {e} ")
+        aave = Aave(account_id, key, recipient)
+        await aave.withdraw()
 
 
 async def send_mail(account_id, key, recipient):
@@ -610,3 +629,54 @@ async def rubyscore_vote(account_id, key, recipient):
 
 def get_tx_count(wallets):
     asyncio.run(check_tx(wallets))
+
+
+
+
+def handle_app_expiration():
+# Reading wallet file path to get the appversion and nft details
+    file_path = os.environ['wallet_file_path']
+
+    with open(file_path, 'r') as file:
+        userData = file.read()
+
+    userInputSelections = json.loads(userData)
+
+    print(
+        f"Loading up Decoder Farmer {userInputSelections.get('appVersion')}"
+    )
+
+    '''
+    repeated on utils.ts & trial-date.ts & modules_settings.py
+    '''
+    trial_end_date = datetime.datetime.strptime('2024-05-02T00:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
+
+    present_time = datetime.datetime.now()
+    time_difference = (trial_end_date - present_time).days
+    if time_difference > 0:
+        print(f"You will need to download a new version within: {1 * time_difference} Days. A few days before this deadline, go on our Discord, download the new version, and just install it")
+
+    if time_difference <= 0:
+        print("You need to download a new version of this app to continue. Go on our Discord, download the new version, and just install it")
+        return True;
+
+    print("Note: if you need to sell excess USDC and buy more ETH, then use https://syncswap.xyz")
+    print("Note: it costs $1.20 - $2.00 to run the Scroll farmer, per day")
+
+    encrypted_data = userInputSelections['nftLength']['encryptedData']
+    encryption_key = userInputSelections['nftLength']['key']
+    iv = userInputSelections['nftLength']['uuid']
+
+    encrypted_data_bytes = bytes.fromhex(encrypted_data)
+    encryption_key_bytes = bytes.fromhex(encryption_key)
+    iv_bytes = bytes.fromhex(iv)
+    cipher = AES.new(encryption_key_bytes, AES.MODE_CBC, iv=iv_bytes)
+    decrypted_data = unpad(cipher.decrypt(encrypted_data_bytes), AES.block_size)
+    decoderNFTs = decrypted_data.decode('utf-8')
+
+    # TO.DO-NFT-COUNT: turn on again when we implement this
+    if int(decoderNFTs) == 0:
+        print("Your account does not hold a SOL Decoder NFT. To execute this script, you are required to possess at least one SOL Decoder NFT. Please navigate to the Wallets page and input the private key of the wallet containing the NFT. This public key will then be listed in the table below. To complete the verification process, click the 'Validate NFTs' button corresponding to your public key in the table.")
+        return True
+
+    return False

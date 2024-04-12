@@ -91,9 +91,11 @@ class Account:
 
         if from_token == "ETH":
             balance = await self.w3.eth.get_balance(self.address)
+
             amount_wei = int(balance * percent) if all_amount else self.w3.to_wei(random_amount, "ether")
             amount = self.w3.from_wei(int(balance * percent), "ether") if all_amount else random_amount
         else:
+            # all_amount = True
             balance = await self.get_balance(SCROLL_TOKENS[from_token])
             amount_wei = int(balance["balance_wei"] * percent) \
                 if all_amount else int(random_amount * 10 ** balance["decimal"])
@@ -126,18 +128,94 @@ class Account:
 
             tx_data = await self.get_tx_data()
 
-            transaction = await contract.functions.approve(
-                contract_address,
-                approve_amount
-            ).build_transaction(tx_data)
+            # logger.info(f"contract_address-----{contract_address}")
+            # logger.info(f"approve_amount-----{approve_amount}")
+            try:
+              transaction = await contract.functions.approve(
+                  contract_address,
+                  approve_amount
+              ).build_transaction(tx_data)
 
-            signed_txn = await self.sign(transaction)
+              # logger.info(f"transaction========{transaction}")
+            except Exception as e:
+              logger.error(f"Output while dealing with func:await contract.functions.approve under approve function{e} ")
+              transaction = await contract.functions.approve(
+                  contract_address,
+                  approve_amount
+              ).build_transaction(tx_data)
 
-            txn_hash = await self.send_raw_transaction(signed_txn)
+            try:
+              signed_txn = await self.sign(transaction)
+            except Exception as e:
+              logger.error(f"Output while dealing with func:await self.sign(transaction) under approve function {e} ")
+              signed_txn = await self.sign(transaction)
 
-            await self.wait_until_tx_finished(txn_hash.hex())
+            try:
+              txn_hash = await self.send_raw_transaction(signed_txn)
+            except Exception as e:
+              logger.error(f"Output while dealing with func:await self.send_raw_transaction(signed_txn) under approve function {e} ")
+              txn_hash = await self.send_raw_transaction(signed_txn)
+
+            try:
+              await self.wait_until_tx_finished(txn_hash.hex())
+            except Exception as e:
+              logger.error(f"Output while dealing with func:await self.wait_until_tx_finished(txn_hash.hex()) under approve function {e} ")
 
             await sleep(5, 20)
+
+    # static approve function to test or run with insufficient funds
+    # async def approve(self, amount: float, token_address: str, contract_address: str) -> None:
+    #     token_address = self.w3.to_checksum_address(token_address)
+    #     contract_address = self.w3.to_checksum_address(contract_address)
+
+    #     contract = self.w3.eth.contract(address=token_address, abi=ERC20_ABI)
+
+    #     allowance_amount = await self.check_allowance(token_address, contract_address)
+
+    #     logger.info(f"allowance_amount{allowance_amount}")
+
+    #     if amount > allowance_amount or amount == 0:
+    #         logger.success(f"[{self.account_id}][{self.address}] Make approve")
+
+    #         approve_amount = 2 ** 128
+
+    #         tx_data = await self.get_tx_data()
+
+    #         try:
+    #           # transaction = await contract.functions.approve(
+    #           #     contract_address,
+    #           #     approve_amount
+    #           # ).build_transaction(tx_data)
+    #           transaction = {'gas': 187199, 'chainId': 534352, 'from': '0x3f29f6815f12e33cDEC040a453cd9120525dB4b9', 'value': 100000000000000, 'nonce': 3, 'gasPrice': 550000000, 'to': '0xAA111C62cDEEf205f70E6722D1E22274274ec12F', 'data': '0x67ffb66a00000000000000000000000000000000000000000000000000000000000504fb00000000000000000000000000000000000000000000000000000000000000800000000000000000000000003f29f6815f12e33cdec040a453cd9120525db4b900000000000000000000000000000000000000000000000000000000661c66c70000000000000000000000000000000000000000000000000000000000000001000000000000000000000000530000000000000000000000000000000000000400000000000000000000000006efdbff2a14a7c8e15944d1f4a48f9f95f663a40000000000000000000000000000000000000000000000000000000000000000'}
+
+    #         except Exception as e:
+    #           logger.error(f"Output while dealing with func:await contract.functions.approve under approve function{e} ")
+    #           transaction = await contract.functions.approve(
+    #               contract_address,
+    #               approve_amount
+    #           ).build_transaction(tx_data)
+
+    #         logger.info(f"transaction on approve : {transaction}")
+
+    #         try:
+    #           signed_txn = await self.sign(transaction)
+    #         except Exception as e:
+    #           logger.error(f"Output while dealing with func:await self.sign(transaction) under approve function {e} ")
+    #           signed_txn = await self.sign(transaction)
+
+    #         try:
+    #           txn_hash = await self.send_raw_transaction(signed_txn)
+    #         except Exception as e:
+    #           logger.error(f"Output while dealing with func:await self.send_raw_transaction(signed_txn) under approve function {e} ")
+    #           txn_hash = await self.send_raw_transaction(signed_txn)
+
+    #         try:
+    #           await self.wait_until_tx_finished(txn_hash.hex())
+    #         except Exception as e:
+    #           logger.error(f"Output while dealing with func:await self.wait_until_tx_finished(txn_hash.hex()) under approve function {e} ")
+
+    #         await sleep(5, 20)
+
 
     async def wait_until_tx_finished(self, hash: str, max_wait_time=180) -> None:
         start_time = time.time()
@@ -159,6 +237,48 @@ class Account:
                     return
                 await asyncio.sleep(1)
 
+
+# static sign function to run with insufficient funds
+    # async def sign(self, transaction) -> Any:
+    #     # if transaction.get("gasPrice", None) is None:
+
+
+    #     max_priority_fee_per_gas = self.w3.to_wei(MAX_PRIORITY_FEE["ethereum"], "gwei")
+    #     max_fee_per_gas = await self.w3.eth.gas_price
+
+
+    #     transaction.update(
+    #         {
+    #             "maxPriorityFeePerGas": max_priority_fee_per_gas,
+    #             "maxFeePerGas": max_fee_per_gas,
+    #         }
+    #     )
+
+    #     logger.info(f"transaction under sign--{transaction}")
+
+    #     try:
+    #         # Add nonce if it's not already present in the transaction
+    #         if 'nonce' not in transaction:
+    #             transaction['nonce'] = 3
+
+    #         gas = 10000000000000000
+    #         gas = int(gas * GAS_MULTIPLIER)
+
+    #         logger.info(f"gas------- {gas}")
+
+    #         transaction.update({"gas": gas})
+
+    #         logger.info(f"transaction after updating gas------:{transaction}")
+
+    #         logger.info(f"private key--------:{self.private_key}")
+
+    #         signed_txn = self.w3.eth.account.sign_transaction(transaction, self.private_key)
+    #         return signed_txn
+
+    #     except Exception as e:
+    #         logger.error(f"Error in sign_transaction: {e}")
+    #         return None
+
     async def sign(self, transaction) -> Any:
         if transaction.get("gasPrice", None) is None:
             max_priority_fee_per_gas = self.w3.to_wei(MAX_PRIORITY_FEE["ethereum"], "gwei")
@@ -171,12 +291,20 @@ class Account:
                 }
             )
 
+        # logger.info(f"transaction under sign--{transaction}")
+
         gas = await self.w3.eth.estimate_gas(transaction)
         gas = int(gas * GAS_MULTIPLIER)
-
+        # logger.info(f"gas------- {gas}")
         transaction.update({"gas": gas})
+        # logger.info(f"transaction after updating gas------:{transaction}")
 
-        signed_txn = self.w3.eth.account.sign_transaction(transaction, self.private_key)
+        try:
+            signed_txn = self.w3.eth.account.sign_transaction(transaction, self.private_key)
+        except Exception as e:
+            logger.error(f"Error in sign_transaction: {e}")
+            signed_txn = self.w3.eth.account.sign_transaction(transaction, self.private_key)
+
 
         return signed_txn
 

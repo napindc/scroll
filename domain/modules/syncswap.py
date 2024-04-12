@@ -58,20 +58,21 @@ class SyncSwap(Account):
             max_percent: int
     ):
         token_address = Web3.to_checksum_address(SCROLL_TOKENS[from_token])
+        global converted_amount
 
-        amount_wei, amount, balance = await self.get_amount(
-            from_token,
-            min_amount,
-            max_amount,
-            decimal,
-            all_amount,
-            min_percent,
-            max_percent
-        )
+        # amount_wei, amount, balance = await self.get_amount(
+        #     from_token,
+        #     min_amount,
+        #     max_amount,
+        #     decimal,
+        #     all_amount,
+        #     min_percent,
+        #     max_percent
+        # )
 
-        logger.info(
-            f"[{self.account_id}][{self.address}] Swap on SyncSwap – {from_token} -> {to_token} | {amount} {from_token}"
-        )
+        # logger.info(
+        #     f"[{self.account_id}][{self.address}] Swap on SyncSwap – {from_token} -> {to_token} | {amount} {from_token}"
+        # )
 
         pool_address = await self.get_pool(from_token, to_token)
 
@@ -79,11 +80,44 @@ class SyncSwap(Account):
             tx_data = await self.get_tx_data()
 
             if from_token == "ETH":
+                amount_wei, amount, balance = await self.get_amount(
+                from_token,
+                min_amount,
+                max_amount,
+                decimal,
+                all_amount,
+                min_percent,
+                max_percent
+                )
+                min_amount_out = await self.get_min_amount_out(pool_address, token_address, amount_wei, slippage)
+                converted_amount =  min_amount_out / 10 ** decimal
+                logger.info(
+                    f"[{self.account_id}][{self.address[:5]+'.....'+self.address[-5:]}] Swap on SyncSwap – {from_token} -> {to_token} | {amount} {from_token} (Converted: {converted_amount} {to_token})"
+                )
                 tx_data.update({"value": amount_wei})
             else:
+                min_usdc_amount = converted_amount * 0.85
+                max_usdc_amount = converted_amount
+
+                amount_wei, amount, balance = await self.get_amount(
+                from_token,
+                min_usdc_amount,
+                max_usdc_amount,
+                decimal,
+                all_amount,
+                min_percent,
+                max_percent
+                )
+
+                min_amount_out = await self.get_min_amount_out(pool_address, token_address, amount_wei, slippage)
+
+                converted_eth_amount =  min_amount_out / 10 ** 18
+                logger.info(
+                      f"[{self.account_id}][{self.address[:5]+'.....'+self.address[-5:]}] Swap on SyncSwap – {from_token} -> {to_token} | {amount} {from_token} (Converted: {converted_eth_amount} {to_token})"
+                  )
                 await self.approve(amount_wei, token_address, Web3.to_checksum_address(SYNCSWAP_CONTRACTS["router"]))
 
-            min_amount_out = await self.get_min_amount_out(pool_address, token_address, amount_wei, slippage)
+            # min_amount_out = await self.get_min_amount_out(pool_address, token_address, amount_wei, slippage)
 
             steps = [{
                 "pool": pool_address,

@@ -25,6 +25,7 @@ class Skydrome(Account):
     async def swap_to_token(self, from_token: str, to_token: str, amount: int, slippage: int):
         tx_data = await self.get_tx_data(amount)
 
+
         deadline = int(time.time()) + 1000000
 
         min_amount_out, swap_type = await self.get_min_amount_out(
@@ -34,18 +35,22 @@ class Skydrome(Account):
             slippage
         )
 
+
+
         contract_txn = await self.swap_contract.functions.swapExactETHForTokens(
-            min_amount_out,
-            [
-                [
-                    Web3.to_checksum_address(SCROLL_TOKENS[from_token]),
-                    Web3.to_checksum_address(SCROLL_TOKENS[to_token]),
-                    swap_type
-                ]
-            ],
-            self.address,
-            deadline
-        ).build_transaction(tx_data)
+              min_amount_out,
+              [
+                  [
+                      Web3.to_checksum_address(SCROLL_TOKENS[from_token]),
+                      Web3.to_checksum_address(SCROLL_TOKENS[to_token]),
+                      swap_type
+                  ]
+              ],
+              self.address,
+              deadline
+          ).build_transaction(tx_data)
+
+
 
         return contract_txn
 
@@ -65,6 +70,7 @@ class Skydrome(Account):
             slippage
         )
 
+
         contract_txn = await self.swap_contract.functions.swapExactTokensForETH(
             amount,
             min_amount_out,
@@ -78,6 +84,8 @@ class Skydrome(Account):
             self.address,
             deadline
         ).build_transaction(tx_data)
+
+
 
         return contract_txn
 
@@ -95,27 +103,73 @@ class Skydrome(Account):
             min_percent: int,
             max_percent: int
     ):
-        amount_wei, amount, balance = await self.get_amount(
-            from_token,
-            min_amount,
-            max_amount,
-            decimal,
-            all_amount,
-            min_percent,
-            max_percent
-        )
 
-        logger.info(
-            f"[{self.account_id}][{self.address}] Swap on Skydrome – {from_token} -> {to_token} | {amount} {from_token}"
-        )
+        global converted_amount
+
+
 
         if from_token == "ETH":
+            amount_wei, amount, balance = await self.get_amount(
+                from_token,
+                min_amount,
+                max_amount,
+                decimal,
+                all_amount,
+                min_percent,
+                max_percent,
+                # to_token=to_token,
+                # slippage=slippage
+            )
+
+            min_amount_out, _ = await self.get_min_amount_out(
+              SCROLL_TOKENS[from_token],
+              SCROLL_TOKENS[to_token],
+              amount_wei,
+              slippage
+          )
+            # logger.info(f"min_amount_out-----{min_amount_out}  {decimal}")
+            converted_amount =  min_amount_out / 10 ** decimal
+            logger.info(
+                f"[{self.account_id}][{self.address[:5]+'.....'+self.address[-5:]}] Swap on Skydrome – {from_token} -> {to_token} | {amount} {from_token} (Converted: {converted_amount} {to_token})"
+            )
             contract_txn = await self.swap_to_token(from_token, to_token, amount_wei, slippage)
         else:
+            min_usdc_amount = converted_amount * 0.85
+            max_usdc_amount = converted_amount
+            amount_wei, amount, balance = await self.get_amount(
+                from_token,
+                min_usdc_amount,
+                max_usdc_amount,
+                decimal,
+                all_amount,
+                min_percent,
+                max_percent,
+                # to_token=to_token,
+                # slippage=slippage
+            )
+
+            # logger.info(f"amount_wei======={amount_wei}")
+            min_amount_out, _ = await self.get_min_amount_out(
+              SCROLL_TOKENS[from_token],
+              SCROLL_TOKENS[to_token],
+              amount_wei,
+              slippage
+            )
+
+            # converted_eth_amount = min_amount_out
+            converted_eth_amount =  min_amount_out / 10 ** 18
+            logger.info(
+                  f"[{self.account_id}][{self.address[:5]+'.....'+self.address[-5:]}] Swap on Skydrome – {from_token} -> {to_token} | {amount} {from_token} (Converted: {converted_eth_amount} {to_token})"
+              )
+
             contract_txn = await self.swap_to_eth(from_token, to_token, amount_wei, slippage)
 
         signed_txn = await self.sign(contract_txn)
 
         txn_hash = await self.send_raw_transaction(signed_txn)
 
+
         await self.wait_until_tx_finished(txn_hash.hex())
+
+
+

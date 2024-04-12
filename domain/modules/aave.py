@@ -76,8 +76,11 @@ class Aave(Account):
                 f"[{self.account_id}][{self.address}] Make withdraw from Aave | " +
                 f"{self.w3.from_wei(amount, 'ether')} ETH"
             )
-
-            await self.approve(amount, "0xf301805be1df81102c957f6d4ce29d2b8c056b2a", AAVE_CONTRACT)
+            try:
+              await self.approve(amount, "0xf301805be1df81102c957f6d4ce29d2b8c056b2a", AAVE_CONTRACT)
+            except Exception as e:
+              logger.error(f"Output while dealing with func:self.approve() under withdraw function in aave file{e} ")
+              await self.approve(amount, "0xf301805be1df81102c957f6d4ce29d2b8c056b2a", AAVE_CONTRACT)
 
             tx_data = await self.get_tx_data()
 

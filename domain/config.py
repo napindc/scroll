@@ -1,72 +1,74 @@
 import json
+import os
+base_dir = os.path.dirname(os.path.abspath(__file__))
 
-with open('domain/data/rpc.json') as file:
+with open(os.path.join(base_dir, 'data/rpc.json')) as file:
     RPC = json.load(file)
 
-with open('domain/data/abi/erc20_abi.json') as file:
+with open(os.path.join(base_dir, 'data/abi/erc20_abi.json')) as file:
     ERC20_ABI = json.load(file)
 
-with open('domain/data/abi/bridge/deposit.json') as file:
+with open(os.path.join(base_dir, 'data/abi/bridge/deposit.json')) as file:
     DEPOSIT_ABI = json.load(file)
 
-with open('domain/data/abi/bridge/withdraw.json') as file:
+with open(os.path.join(base_dir, 'data/abi/bridge/withdraw.json')) as file:
     WITHDRAW_ABI = json.load(file)
 
-with open('domain/data/abi/bridge/oracle.json') as file:
+with open(os.path.join(base_dir, 'data/abi/bridge/oracle.json')) as file:
     ORACLE_ABI = json.load(file)
 
-with open('domain/data/abi/scroll/weth.json') as file:
+with open(os.path.join(base_dir, 'data/abi/scroll/weth.json')) as file:
     WETH_ABI = json.load(file)
 
-with open("domain/data/abi/syncswap/router.json", "r") as file:
+with open(os.path.join(base_dir, 'data/abi/syncswap/router.json'), "r") as file:
     SYNCSWAP_ROUTER_ABI = json.load(file)
 
-with open('domain/data/abi/syncswap/classic_pool.json') as file:
+with open(os.path.join(base_dir, 'data/abi/syncswap/classic_pool.json')) as file:
     SYNCSWAP_CLASSIC_POOL_ABI = json.load(file)
 
-with open('domain/data/abi/syncswap/classic_pool_data.json') as file:
+with open(os.path.join(base_dir, 'data/abi/syncswap/classic_pool_data.json')) as file:
     SYNCSWAP_CLASSIC_POOL_DATA_ABI = json.load(file)
 
-with open("domain/data/abi/skydrome/abi.json", "r") as file:
+with open(os.path.join(base_dir, 'data/abi/skydrome/abi.json'), "r") as file:
     SKYDROME_ROUTER_ABI = json.load(file)
 
-with open("domain/data/abi/zebra/abi.json", "r") as file:
+with open(os.path.join(base_dir, 'data/abi/zebra/abi.json'), "r") as file:
     ZEBRA_ROUTER_ABI = json.load(file)
 
-with open("domain/data/abi/aave/abi.json", "r") as file:
+with open(os.path.join(base_dir, 'data/abi/aave/abi.json'), "r") as file:
     AAVE_ABI = json.load(file)
 
-with open("domain/data/abi/layerbank/abi.json", "r") as file:
+with open(os.path.join(base_dir, 'data/abi/layerbank/abi.json'), "r") as file:
     LAYERBANK_ABI = json.load(file)
 
-with open("domain/data/abi/zerius/abi.json", "r") as file:
+with open(os.path.join(base_dir, 'data/abi/zerius/abi.json'), "r") as file:
     ZERIUS_ABI = json.load(file)
 
-with open("domain/data/abi/l2pass/abi.json", "r") as file:
+with open(os.path.join(base_dir, 'data/abi/l2pass/abi.json'), "r") as file:
     L2PASS_ABI = json.load(file)
 
-with open("domain/data/abi/dmail/abi.json", "r") as file:
+with open(os.path.join(base_dir, 'data/abi/dmail/abi.json'), "r") as file:
     DMAIL_ABI = json.load(file)
 
-with open("domain/data/abi/omnisea/abi.json", "r") as file:
+with open(os.path.join(base_dir, 'data/abi/omnisea/abi.json'), "r") as file:
     OMNISEA_ABI = json.load(file)
 
-with open("domain/data/abi/nft2me/abi.json", "r") as file:
+with open(os.path.join(base_dir, 'data/abi/nft2me/abi.json'), "r") as file:
     NFTS2ME_ABI = json.load(file)
 
-with open("domain/data/abi/gnosis/abi.json", "r") as file:
+with open(os.path.join(base_dir, 'data/abi/gnosis/abi.json'), "r") as file:
     SAFE_ABI = json.load(file)
 
-with open("domain/data/deploy/abi.json", "r") as file:
+with open(os.path.join(base_dir, 'data/deploy/abi.json'), "r") as file:
     DEPLOYER_ABI = json.load(file)
 
-with open("domain/data/deploy/bytecode.txt", "r") as file:
+with open(os.path.join(base_dir, 'data/deploy/bytecode.txt'), "r") as file:
     DEPLOYER_BYTECODE = file.read()
 
-with open("domain/data/abi/zkstars/abi.json", "r") as file:
+with open(os.path.join(base_dir, 'data/abi/zkstars/abi.json'), "r") as file:
     ZKSTARS_ABI = json.load(file)
 
-with open("domain/data/abi/rubyscore/abi.json", "r") as file:
+with open(os.path.join(base_dir, 'data/abi/rubyscore/abi.json'), "r") as file:
     RUBYSCORE_VOTE_ABI = json.load(file)
 
 ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"

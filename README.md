@@ -24,7 +24,7 @@ cd scroll
 
 pip install -r requirements.txt
 
-~/scroll$ python run_swaps.py --wallets WALLET_KEY1 WALLET_KEY2 WALLET_KEYN
+~/scroll$ python run_swaps.py --wallet_file json file that contains keys
 ```
 ---
 <h2>🚨 Features</h2>
